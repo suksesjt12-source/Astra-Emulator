@@ -43,6 +43,9 @@ android {
         providers.gradleProperty("nightly").orNull?.toBooleanStrictOrNull() ?: false
     val isExperimental =
         providers.gradleProperty("experimental").orNull?.toBooleanStrictOrNull() ?: false
+    // Opt-in CPU code generation for SoCs verified to support the A76/A55 ISA baseline.
+    val isAstraHelioOptimized =
+        providers.gradleProperty("astraHelioOptimized").orNull?.toBooleanStrictOrNull() ?: false
 
     buildFeatures {
         viewBinding = true
@@ -102,6 +105,11 @@ android {
                         *extraCMakeArgs.toTypedArray()
                     )
                 )
+
+                if (isAstraHelioOptimized) {
+                    arguments.add("-DYUZU_BUILD_PRESET=optimized")
+                    arguments.add("-DASTRA_MALI_COMPATIBILITY_PROFILE=ON")
+                }
 
                 // Unused by CMake itself - GenerateSCMRev.cmake queries git directly.
                 // This exists purely so this argument LIST changes whenever HEAD moves,
