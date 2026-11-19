@@ -1,0 +1,62 @@
+name: Import Lemon source into Astra
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - ".github/workflows/astra-import-lemon.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: astra-import-lemon-main
+  cancel-in-progress: false
+
+jobs:
+  import-source:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out Astra repository
+        uses: actions/checkout@v4
+        with:
+          ref: main
+          fetch-depth: 1
+
+      - name: Fetch upstream Lemon source
+        run: |
+          git clone --depth 1 --branch main https://github.com/Ghael-V/Lemon-Project.git /tmp/lemon-upstream
+
+      - name: Import upstream files while preserving this workflow
+        run: |
+          rsync -a --delete \
+            --exclude='.git' \
+            --exclude='.github/workflows/astra-import-lemon.yml' \
+            /tmp/lemon-upstream/ ./
+
+          cat > ASTRA-PORTING.md <<'EOF'
+          # Astra Emulator — porting notes
+
+          This repository starts from the public Lemon-Project source baseline.
+
+          - Upstream mirror: https://github.com/Ghael-V/Lemon-Project
+          - Upstream branch imported: main
+          - Upstream copyright and license files are retained.
+          - Astra-specific Mali/Helio G100 changes must be implemented and tested in separate commits.
+          - No Android APK build or device validation is claimed by this import step.
+
+          Keep upstream license headers and notices intact when modifying source files.
+          EOF
+
+      - name: Commit imported source
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -A
+          if git diff --cached --quiet; then
+            echo "No source changes to import."
+            exit 0
+          fi
+          git commit -m "Import Lemon-Project source baseline"
+          git push origin HEAD:main
