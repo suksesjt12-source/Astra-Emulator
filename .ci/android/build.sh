@@ -41,6 +41,8 @@ Options:
 Extra arguments are passed to CMake (e.g. -DCMAKE_OPTION_NAME=VALUE)
 Set the CCACHE variable to "true" to enable build caching.
 The APK and AAB will be output into "artifacts".
+Set ASTRA_HELIO_OPTIMIZED=true only when building for a confirmed ARMv8.2-A
+Cortex-A76/A55 target; the resulting APK is not intended for older ARM64 CPUs.
 
 EOF
 
@@ -82,6 +84,7 @@ done
 : "${TARGET:=standard}"
 : "${TYPE:=Release}"
 : "${DEVEL:=true}"
+: "${ASTRA_HELIO_OPTIMIZED:=false}"
 
 # GetSCMRev.cmake only uses the clean git tag (e.g. "v0.2.3") as the build version when a
 # GIT-RELEASE marker file exists at the repo root when CMake configures - otherwise it falls
@@ -172,6 +175,7 @@ echo "-- building..."
     -Pnightly="$NIGHTLY" \
     -Pexperimental="$EXPERIMENTAL" \
     -PfastDev="${FAST:-false}" \
+    -PastraHelioOptimized="${ASTRA_HELIO_OPTIMIZED}" \
     --info
 
 if [ -n "${ANDROID_KEYSTORE_B64}" ]; then
