@@ -77,7 +77,7 @@ fun ModernAbout(versionText: String, actions: AboutActions) {
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
                 Image(
-                    painter = painterResource(R.drawable.ic_launcher_foreground),
+                    painter = painterResource(R.drawable.astra_mark),
                     contentDescription = null,
                     modifier = Modifier.size(if (landscape) 96.dp else 132.dp)
                 )
