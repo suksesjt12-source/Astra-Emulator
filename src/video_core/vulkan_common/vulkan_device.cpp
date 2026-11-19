@@ -695,6 +695,35 @@ Device::Device(VkInstance instance_, vk::PhysicalDevice physical_, VkSurfaceKHR 
         break;
     }
 
+#if defined(ASTRA_MALI_COMPATIBILITY_PROFILE) && defined(__ANDROID__) && defined(ARCHITECTURE_arm64)
+    // Use the Vulkan driver identity rather than the SoC marketing name: this workaround
+    // is specific to ARM's proprietary Mali driver. Other Android GPU drivers are untouched.
+    if (driver_id == VK_DRIVER_ID_ARM_PROPRIETARY) {
+        LOG_WARNING(Render_Vulkan,
+                    "Astra Mali profile: disabling EDS2/EDS3, provoking vertex, and robustness2 "
+                    "to use conservative driver paths");
+
+        RemoveExtensionFeature(extensions.extended_dynamic_state2,
+                               features.extended_dynamic_state2,
+                               VK_EXT_EXTENDED_DYNAMIC_STATE_2_EXTENSION_NAME);
+        RemoveExtensionFeature(extensions.extended_dynamic_state3,
+                               features.extended_dynamic_state3,
+                               VK_EXT_EXTENDED_DYNAMIC_STATE_3_EXTENSION_NAME);
+        dynamic_state3_blending = false;
+        dynamic_state3_enables = false;
+
+        RemoveExtensionFeature(extensions.provoking_vertex, features.provoking_vertex,
+                               VK_EXT_PROVOKING_VERTEX_EXTENSION_NAME);
+
+        const char* robustness2_extension_name =
+            loaded_extensions.contains(VK_KHR_ROBUSTNESS_2_EXTENSION_NAME)
+                ? VK_KHR_ROBUSTNESS_2_EXTENSION_NAME
+                : VK_EXT_ROBUSTNESS_2_EXTENSION_NAME;
+        RemoveExtensionFeature(extensions.robustness_2, features.robustness2,
+                               robustness2_extension_name);
+    }
+#endif
+
     // VK_EXT_vertex_input_dynamic_state
     if (!Settings::values.vertex_input_dynamic_state.GetValue()) {
         RemoveExtensionFeature(extensions.vertex_input_dynamic_state, features.vertex_input_dynamic_state, VK_EXT_VERTEX_INPUT_DYNAMIC_STATE_EXTENSION_NAME);
