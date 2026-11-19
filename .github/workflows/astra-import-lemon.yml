@@ -32,7 +32,7 @@ jobs:
         run: |
           rsync -a --delete \
             --exclude='.git' \
-            --exclude='.github/workflows/astra-import-lemon.yml' \
+            --exclude='.github/workflows/' \
             /tmp/lemon-upstream/ ./
 
           cat > ASTRA-PORTING.md <<'EOF'
