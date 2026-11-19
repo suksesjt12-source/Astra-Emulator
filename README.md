@@ -51,6 +51,7 @@ Astra is an Android/NDK project. Build requirements and exact CI steps are defin
 
 - [Android build workflow](.github/workflows/android-build.yml)
 - [Porting and development notes](ASTRA-PORTING.md)
+- [Helio and ARM Mali optimization profile](ASTRA-HELIO-PROFILE.md)
 
 A successful compile verifies that the source can be built in that CI environment. It does **not** prove game compatibility or runtime stability on a physical device.
 
