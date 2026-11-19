@@ -9,6 +9,16 @@ name: Android build
 
 on:
   workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - ".ci/android/**"
+      - "src/**"
+      - "externals/**"
+      - "CMakeLists.txt"
+      - "CMakeModules/**"
+      - "cpmfile.json"
+      - ".github/workflows/android-build.yml"
 
 env:
   NDK_VERSION: "28.2.13676358"
@@ -72,7 +82,21 @@ jobs:
 
       - name: Install Android SDK components (NDK + CMake)
         run: |
-          SDK_MANAGER="${ANDROID_SDK_ROOT}/cmdline-tools/latest/bin/sdkmanager"
+          SDK_ROOT="${ANDROID_SDK_ROOT:-${ANDROID_HOME:-}}"
+          if [ -z "$SDK_ROOT" ]; then
+            echo "::error::ANDROID_SDK_ROOT and ANDROID_HOME are both unset on this runner."
+            exit 1
+          fi
+          SDK_MANAGER="$SDK_ROOT/cmdline-tools/latest/bin/sdkmanager"
+          if [ ! -x "$SDK_MANAGER" ]; then
+            SDK_MANAGER="$(find "$SDK_ROOT/cmdline-tools" -maxdepth 3 -type f -name sdkmanager | sort -V | tail -n 1)"
+          fi
+          if [ -z "$SDK_MANAGER" ] || [ ! -x "$SDK_MANAGER" ]; then
+            echo "::error::Could not locate sdkmanager under $SDK_ROOT/cmdline-tools."
+            exit 1
+          fi
+          echo "ANDROID_SDK_ROOT=$SDK_ROOT" >> "$GITHUB_ENV"
+          echo "ANDROID_HOME=$SDK_ROOT" >> "$GITHUB_ENV"
           yes | "$SDK_MANAGER" --licenses > /dev/null
           "$SDK_MANAGER" \
             "platforms;android-36" \
