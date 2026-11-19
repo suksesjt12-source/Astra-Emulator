@@ -49,7 +49,7 @@ class AboutActions(
     val onLink: (Int) -> Unit
 )
 
-/** The About screen: what Lemon is, its build, where to find it, how to support it, and the credits. */
+/** The Astra About screen: project identity, build information, development links, and open-source acknowledgements. */
 @Composable
 fun ModernAbout(versionText: String, actions: AboutActions) {
     val landscape = LocalConfiguration.current.orientation == Configuration.ORIENTATION_LANDSCAPE
