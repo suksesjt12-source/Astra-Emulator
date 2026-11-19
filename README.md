@@ -20,6 +20,14 @@
 
 <h4 align="center">An Android-only Nintendo Switch emulator built for Adreno GPUs.</h4>
 
+> **Astra Emulator is an independent development fork** based on the Lemon-Project source.
+> It is not an official Lemon release and is not endorsed by Team Lemon. This repository is intended
+> for separate Android compatibility and performance engineering, including investigation on
+> MediaTek Helio and ARM Mali devices. Astra-specific changes remain experimental until they pass
+> build and runtime validation. Upstream project information below describes Lemon, not Astra.
+
+
+
 <p align="center">
   <a href="https://lemon-emu.org">Website</a> |
   <a href="https://git.lemon-emu.org/lemon/Lemon-Project">Main repository</a> |
