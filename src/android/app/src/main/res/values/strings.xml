@@ -236,7 +236,7 @@
     <string name="folder">Folder</string>
     <string name="dont_show_again">Don\'t Show Again</string>
     <string name="support_prompt_title">Enjoying Lemon?</string>
-    <string name="support_prompt_description">Lemon is a small independent project. If you enjoy it, you can help keep it going with a Ko-fi or by buying me a coffee, or join the community on Discord to share feedback and get help. Thank you!</string>
+    <string name="support_prompt_description">Astra is an experimental open-source project. Follow development, share test results, or report issues through the project repository.</string>
     <string name="not_now">Not now</string>
     <string name="add_directory_success">New game directory added successfully </string>
     <string name="enable_update_checks">Check for Updates</string>
@@ -567,10 +567,10 @@
     <string name="copied_to_clipboard">Copied to clipboard</string>
     <string name="about_app_description">An experimental Android emulator project focused on compatibility, graphics reliability, and performance research across ARM devices.</string>
     <string name="contributors">Contributors</string>
-    <string name="contributors_description">The people and projects Lemon is built on</string>
+    <string name="contributors_description">Open-source developers and research projects whose work forms part of Astra&apos;s technical foundations.</string>
     <string name="team_lemon" translatable="false">Astra Project</string>
     <string name="team_lemon_members" translatable="false">Independent development · Community-driven research</string>
-    <string name="patrons_thanks">Thanks to our patrons, Gi4nnelli, Xaphiron, Seak, Overlord, Lucky-Kris, Xefir, Pieguy744 and Wiz, for supporting Lemon!</string>
+    <string name="patrons_thanks">Astra is independently maintained. Contributions, device testing, and reproducible bug reports are welcome.</string>
     <string name="team_link">https://github.com/suksesjt12-source/Astra-Emulator</string>
     <string name="logo_credit">Astra visual identity: original project artwork created for this repository.</string>
     <string name="contributors_link" translatable="false">https://github.com/suksesjt12-source/Astra-Emulator#acknowledgements</string>
