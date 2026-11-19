@@ -11,6 +11,13 @@
 #include <stddef.h>
 #include <stdint.h>
 
+#if defined(__aarch64__)
+#include <arm_neon.h>
+#define BCN_HAS_NEON 1
+#else
+#define BCN_HAS_NEON 0
+#endif
+
 namespace {
     constexpr int BlockWidth = 4;
     constexpr int BlockHeight = 4;
@@ -30,11 +37,40 @@ namespace {
                 }
             }
 
-            for (int j = 0; j < BlockHeight && (y + j) < dstH; j++) {
-                size_t dstOffset = j * dstPitch;
-                size_t idxOffset = j * BlockHeight;
-                for (size_t i = 0; i < BlockWidth && (x + i) < dstW; i++, idxOffset++, dstOffset += dstBpp) {
-                    *reinterpret_cast<unsigned int *>(dst + dstOffset) = c[getIdx(idxOffset)].pack8888();
+            const uint32_t palette[4] = {
+                c[0].pack8888(), c[1].pack8888(),
+                c[2].pack8888(), c[3].pack8888()
+            };
+
+            for (size_t j = 0; j < BlockHeight && (y + j) < dstH; ++j) {
+                const size_t dstOffset = j * dstPitch;
+                const size_t idxOffset = j * BlockHeight;
+                size_t i = 0;
+
+#if BCN_HAS_NEON
+                if (dstBpp == sizeof(uint32_t) && x <= dstW && (dstW - x) >= BlockWidth) {
+                    uint32_t indices[4] = {
+                        static_cast<uint32_t>(getIdx(static_cast<int>(idxOffset + 0))),
+                        static_cast<uint32_t>(getIdx(static_cast<int>(idxOffset + 1))),
+                        static_cast<uint32_t>(getIdx(static_cast<int>(idxOffset + 2))),
+                        static_cast<uint32_t>(getIdx(static_cast<int>(idxOffset + 3)))
+                    };
+                    const uint32x4_t indexVector = vld1q_u32(indices);
+                    uint32x4_t pixels = vdupq_n_u32(palette[0]);
+                    pixels = vbslq_u32(vceqq_u32(indexVector, vdupq_n_u32(1)),
+                                       vdupq_n_u32(palette[1]), pixels);
+                    pixels = vbslq_u32(vceqq_u32(indexVector, vdupq_n_u32(2)),
+                                       vdupq_n_u32(palette[2]), pixels);
+                    pixels = vbslq_u32(vceqq_u32(indexVector, vdupq_n_u32(3)),
+                                       vdupq_n_u32(palette[3]), pixels);
+                    vst1q_u8(dst + dstOffset, vreinterpretq_u8_u32(pixels));
+                    i = BlockWidth;
+                }
+#endif
+
+                for (; i < BlockWidth && (x + i) < dstW; ++i) {
+                    const uint32_t pixel = palette[getIdx(static_cast<int>(idxOffset + i))];
+                    *reinterpret_cast<uint32_t *>(dst + dstOffset + i * dstBpp) = pixel;
                 }
             }
         }
@@ -131,9 +167,48 @@ namespace {
                 c[7] = isSigned ? 127 : 255;
             }
 
-            for (size_t j = 0; j < BlockHeight && (y + j) < dstH; j++) {
-                for (size_t i = 0; i < BlockWidth && (x + i) < dstW; i++) {
-                    dst[channel + (i * dstBpp) + (j * dstPitch)] = static_cast<uint8_t>(c[getIdx((j * BlockHeight) + i)]);
+#if BCN_HAS_NEON
+            if (x <= dstW && (dstW - x) >= BlockWidth) {
+                uint8_t palette[8];
+                for (size_t i = 0; i < 8; ++i) {
+                    palette[i] = static_cast<uint8_t>(c[i]);
+                }
+
+                size_t j = 0;
+                for (; j + 1 < BlockHeight && (y + j + 1) < dstH; j += 2) {
+                    uint8_t indices[8];
+                    for (size_t i = 0; i < BlockWidth; ++i) {
+                        indices[i] = getIdx(static_cast<int>(j * BlockHeight + i));
+                        indices[BlockWidth + i] =
+                            getIdx(static_cast<int>((j + 1) * BlockHeight + i));
+                    }
+
+                    const uint8x8_t decoded = vtbl1_u8(vld1_u8(palette), vld1_u8(indices));
+                    uint8_t values[8];
+                    vst1_u8(values, decoded);
+
+                    for (size_t i = 0; i < 8; ++i) {
+                        const size_t row = j + (i / BlockWidth);
+                        const size_t column = i % BlockWidth;
+                        dst[channel + column * dstBpp + row * dstPitch] = values[i];
+                    }
+                }
+
+                // Handle a final unpaired row, if any.
+                for (; j < BlockHeight && (y + j) < dstH; ++j) {
+                    for (size_t i = 0; i < BlockWidth; ++i) {
+                        dst[channel + i * dstBpp + j * dstPitch] =
+                            static_cast<uint8_t>(c[getIdx(static_cast<int>(j * BlockHeight + i))]);
+                    }
+                }
+                return;
+            }
+#endif
+
+            for (size_t j = 0; j < BlockHeight && (y + j) < dstH; ++j) {
+                for (size_t i = 0; i < BlockWidth && (x + i) < dstW; ++i) {
+                    dst[channel + (i * dstBpp) + (j * dstPitch)] =
+                        static_cast<uint8_t>(c[getIdx(static_cast<int>((j * BlockHeight) + i))]);
                 }
             }
         }
