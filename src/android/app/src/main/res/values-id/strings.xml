@@ -4,7 +4,7 @@
     <string name="notice_notification_channel_name">Pemberitahuan dan error</string>
     <string name="notice_notification_channel_description">Menampilkan pemberitahuan ketika terjadi kesalahan.</string>
     <string name="notification_permission_not_granted">Izin notifikasi tidak diberikan!</string>
-    <string name="app_notification_channel_description">Notifikasi emulator Lemon</string>
+    <string name="app_notification_channel_description">Notifikasi Astra Emulator</string>
     <string name="app_notification_running">Lemon sedang berjalan</string>
     <string name="seconds">Detik</string>
 
