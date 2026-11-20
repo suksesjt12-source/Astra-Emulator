@@ -34,6 +34,8 @@ The repository is a work in progress. Source code and CI changes do not automati
 | GPU research | Adreno and ARM Mali compatibility investigations |
 | Priorities | Correct rendering, stability, memory use, and frame pacing |
 | Distribution | CI builds are for development and verification |
+| Astra package | `dev.astra.emulator` |
+| Helio profile | Quick Settings preset plus optional ARMv8.2-A build target |
 
 Hardware support is not guaranteed. Results can vary substantially with the Android version, system driver, GPU, memory pressure, and individual game.
 
@@ -51,6 +53,8 @@ Astra is an Android/NDK project. Build requirements and exact CI steps are defin
 
 - [Android build workflow](.github/workflows/android-build.yml)
 - [Porting and development notes](ASTRA-PORTING.md)
+- [Helio and ARM Mali optimization profile](ASTRA-HELIO-PROFILE.md)
+- Standalone Astra APK flavor: `dev.astra.emulator` (build target: `astra`)
 
 A successful compile verifies that the source can be built in that CI environment. It does **not** prove game compatibility or runtime stability on a physical device.
 

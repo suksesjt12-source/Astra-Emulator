@@ -43,6 +43,9 @@ android {
         providers.gradleProperty("nightly").orNull?.toBooleanStrictOrNull() ?: false
     val isExperimental =
         providers.gradleProperty("experimental").orNull?.toBooleanStrictOrNull() ?: false
+    // Opt-in CPU code generation for SoCs verified to support the A76/A55 ISA baseline.
+    val isAstraHelioOptimized =
+        providers.gradleProperty("astraHelioOptimized").orNull?.toBooleanStrictOrNull() ?: false
 
     buildFeatures {
         viewBinding = true
@@ -102,6 +105,10 @@ android {
                         *extraCMakeArgs.toTypedArray()
                     )
                 )
+
+                if (isAstraHelioOptimized) {
+                    arguments.add("-DYUZU_BUILD_PRESET=optimized")
+                }
 
                 // Unused by CMake itself - GenerateSCMRev.cmake queries git directly.
                 // This exists purely so this argument LIST changes whenever HEAD moves,
@@ -280,15 +287,15 @@ android {
             }
         }
 
-        // Lemon Spoofed: Lemon, nothing else changed, under AnTuTu's package name, which some phone
-        // makers (MediaTek devices above all) give their full performance profile. It was Lemon
-        // Lite & Spoofed under the same package, so those installs update into it, data kept.
+        // Astra's standalone Android flavor. Keep a unique application ID so it
+        // can coexist with AnTuTu and the upstream Lemon package without impersonation.
+        // The internal flavor name remains "spoofed" for native updater compatibility.
         create("spoofed") {
             dimension = "version"
             minSdk = 31
-            manifestPlaceholders += mapOf("appNameBase" to "Lemon Spoofed")
-            resValue("string", "app_name_suffixed", "Lemon Spoofed")
-            applicationId = "com.antutu.ABenchMark"
+            manifestPlaceholders += mapOf("appNameBase" to "Astra Emulator")
+            resValue("string", "app_name_suffixed", "Astra Emulator")
+            applicationId = "dev.astra.emulator"
 
             externalNativeBuild {
                 cmake {
@@ -364,7 +371,7 @@ android {
 
         // apply nightly/experimental suffix I/A
         resValue("string", "app_name_suffixed", "$currentName$suffix")
-        resValue("string", "app_name", "Lemon$suffix")
+        resValue("string", "app_name", "$currentName$suffix")
     }
 
     sourceSets {

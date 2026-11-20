@@ -12,7 +12,7 @@ import dev.lemon.lemon_emu.LemonApplication
 import dev.lemon.lemon_emu.R
 
 /**
- * Quick Settings tile that cycles the global performance preset (Battery/Balanced/Quality)
+ * Quick Settings tile that cycles the global performance preset (Speed/Normal/Quality/Helio)
  * without opening the app. Applies to the global config, so it takes effect on the next game
  * launch - it doesn't hot-reload settings into an emulation session that's already running.
  */

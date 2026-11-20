@@ -9,6 +9,22 @@ name: Android build
 
 on:
   workflow_dispatch:
+    inputs:
+      astra_helio_optimized:
+        description: "Use the ARMv8.2-A optimized build for a verified Cortex-A76/A55 target"
+        required: false
+        default: false
+        type: boolean
+  pull_request:
+    branches: [main]
+    paths:
+      - ".ci/android/**"
+      - "src/**"
+      - "externals/**"
+      - "CMakeLists.txt"
+      - "CMakeModules/**"
+      - "cpmfile.json"
+      - ".github/workflows/android-build.yml"
   push:
     branches: [main]
     paths:
@@ -25,9 +41,31 @@ env:
   CMAKE_VERSION: "3.31.6"
 
 jobs:
+  preflight:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Validate Android build script syntax
+        run: sh -n .ci/android/build.sh
+      - name: Validate Astra profile wiring
+        run: |
+          grep -q 'ASTRA_HELIO_OPTIMIZED' .ci/android/build.sh
+          grep -q 'astraHelioOptimized' src/android/app/build.gradle.kts
+          grep -q 'applicationId = "dev.astra.emulator"' src/android/app/build.gradle.kts
+          ! grep -q 'applicationId = "com.antutu.ABenchMark"' src/android/app/build.gradle.kts
+          grep -q 'Preset.HELIO' src/android/app/src/main/java/dev/lemon/lemon_emu/utils/PerformancePresets.kt
+          grep -q 'preset_helio' src/android/app/src/main/res/values/strings.xml
+          grep -q 'arm64-v8a' src/android/app/build.gradle.kts
+          grep -q 'YUZU_BUILD_PRESET' CMakeLists.txt
+          python3 -c "import xml.etree.ElementTree as E; E.parse('src/android/app/src/main/res/values/strings.xml')"
+
   build:
+    needs: preflight
     runs-on: ubuntu-latest
     timeout-minutes: 90
+    env:
+      ASTRA_HELIO_OPTIMIZED: ${{ github.event_name == 'workflow_dispatch' && inputs.astra_helio_optimized || false }}
 
     steps:
       - name: Checkout
@@ -112,21 +150,21 @@ jobs:
             *) echo "flag=" >> "$GITHUB_OUTPUT"; echo "name=standard" >> "$GITHUB_OUTPUT" ;;
           esac
 
-      - name: Build APK (standard flavor, Release)
+      - name: Build APK (Astra flavor, Release)
         run: |
           export ANDROID_NDK_ROOT="${ANDROID_SDK_ROOT}/ndk/${NDK_VERSION}"
           export CCACHE_DIR="$HOME/.cache/ccache"
           mkdir -p "$CCACHE_DIR"
           ccache --max-size=5G
           chmod +x .ci/android/build.sh
-          CCACHE=true .ci/android/build.sh -t standard -b Release ${{ steps.channel.outputs.flag }}
+          CCACHE=true .ci/android/build.sh -t astra -b Release ${{ steps.channel.outputs.flag }}
           ccache --show-stats
 
       - name: Upload APK/AAB artifacts
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: lemon-project-${{ steps.channel.outputs.name }}-release
+          name: astra-${{ steps.channel.outputs.name }}-release
           path: artifacts/
           retention-days: 14
           if-no-files-found: warn

@@ -14,6 +14,8 @@ import dev.lemon.lemon_emu.features.settings.model.IntSetting
  * - Normal: the default settings. A fresh install is in Normal, and Normal puts every setting a
  *   mode touches back to its default, so the two can't drift apart.
  * - Quality: a sharper image for strong devices.
+ * - Helio: a conservative GPU workload for midrange Mali devices, trading some image detail for
+ *   lower rendering cost and asynchronous shader work.
  * Every setting a mode touches can still be changed one by one; the active mode is simply the one
  * whose values the settings hold (none when they were tuned by hand). Applied to the config loaded
  * now: the global one, or a game's custom config.
@@ -27,7 +29,8 @@ object PerformancePresets {
     enum class Preset(val titleRes: Int, val descriptionRes: Int) {
         SPEED(R.string.preset_speed, R.string.preset_speed_description),
         NORMAL(R.string.preset_normal, R.string.preset_normal_description),
-        QUALITY(R.string.preset_quality, R.string.preset_quality_description)
+        QUALITY(R.string.preset_quality, R.string.preset_quality_description),
+        HELIO(R.string.preset_helio, R.string.preset_helio_description)
     }
 
     /** A mode's value for one setting; null means the setting's default. */
@@ -50,21 +53,38 @@ object PerformancePresets {
             int(IntSetting.RENDERER_SCALING_FILTER, 1),
             int(IntSetting.RENDERER_ANTI_ALIASING, 0),
             int(IntSetting.RENDERER_ACCURACY, 0),
-            bool(BooleanSetting.RENDERER_ASYNCHRONOUS_SHADERS, true)
+            bool(BooleanSetting.RENDERER_ASYNCHRONOUS_SHADERS, true),
+            bool(BooleanSetting.RENDERER_ASYNCHRONOUS_GPU_EMULATION, null),
+            bool(BooleanSetting.RENDERER_USE_DISK_SHADER_CACHE, null)
         )
         Preset.NORMAL -> listOf(
             int(IntSetting.RENDERER_RESOLUTION, null),
             int(IntSetting.RENDERER_SCALING_FILTER, null),
             int(IntSetting.RENDERER_ANTI_ALIASING, null),
             int(IntSetting.RENDERER_ACCURACY, null),
-            bool(BooleanSetting.RENDERER_ASYNCHRONOUS_SHADERS, null)
+            bool(BooleanSetting.RENDERER_ASYNCHRONOUS_SHADERS, null),
+            bool(BooleanSetting.RENDERER_ASYNCHRONOUS_GPU_EMULATION, null),
+            bool(BooleanSetting.RENDERER_USE_DISK_SHADER_CACHE, null)
         )
         Preset.QUALITY -> listOf(
             int(IntSetting.RENDERER_RESOLUTION, 6),
             int(IntSetting.RENDERER_SCALING_FILTER, 2),
             int(IntSetting.RENDERER_ANTI_ALIASING, 1),
             int(IntSetting.RENDERER_ACCURACY, 1),
-            bool(BooleanSetting.RENDERER_ASYNCHRONOUS_SHADERS, false)
+            bool(BooleanSetting.RENDERER_ASYNCHRONOUS_SHADERS, false),
+            bool(BooleanSetting.RENDERER_ASYNCHRONOUS_GPU_EMULATION, null),
+            bool(BooleanSetting.RENDERER_USE_DISK_SHADER_CACHE, null)
+        )
+        Preset.HELIO -> listOf(
+            // Res3_4X = 2, NearestNeighbor = 0, AntiAliasing::None = 0,
+            // and GpuAccuracy::Low = 0. Keep the profile independent of device clocks.
+            int(IntSetting.RENDERER_RESOLUTION, 2),
+            int(IntSetting.RENDERER_SCALING_FILTER, 0),
+            int(IntSetting.RENDERER_ANTI_ALIASING, 0),
+            int(IntSetting.RENDERER_ACCURACY, 0),
+            bool(BooleanSetting.RENDERER_ASYNCHRONOUS_SHADERS, true),
+            bool(BooleanSetting.RENDERER_ASYNCHRONOUS_GPU_EMULATION, true),
+            bool(BooleanSetting.RENDERER_USE_DISK_SHADER_CACHE, true)
         )
     }
 
