@@ -80,7 +80,7 @@ option(LEMON_SPOOFED "Lemon Lite & Spoofed: installed under another app's packag
 # Enabled by default only for Android ARM64; runtime detection keeps other GPU drivers untouched.
 cmake_dependent_option(ASTRA_MALI_COMPATIBILITY_PROFILE
     "Enable Astra's ARM Mali Vulkan compatibility profile (Android ARM64 only)"
-    ON "ANDROID AND ARCHITECTURE_arm64" OFF)
+    OFF "ANDROID AND ARCHITECTURE_arm64" OFF)
 
 if (ASTRA_MALI_COMPATIBILITY_PROFILE)
     add_compile_definitions(ASTRA_MALI_COMPATIBILITY_PROFILE=1)
