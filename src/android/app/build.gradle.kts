@@ -46,9 +46,6 @@ android {
     // Opt-in CPU code generation for SoCs verified to support the A76/A55 ISA baseline.
     val isAstraHelioOptimized =
         providers.gradleProperty("astraHelioOptimized").orNull?.toBooleanStrictOrNull() ?: false
-    // Driver compatibility workarounds are separate from CPU code generation and default off.
-    val isAstraMaliCompatibilityProfile =
-        providers.gradleProperty("astraMaliCompatibilityProfile").orNull?.toBooleanStrictOrNull() ?: false
 
     buildFeatures {
         viewBinding = true
@@ -111,9 +108,6 @@ android {
 
                 if (isAstraHelioOptimized) {
                     arguments.add("-DYUZU_BUILD_PRESET=optimized")
-                }
-                if (isAstraMaliCompatibilityProfile) {
-                    arguments.add("-DASTRA_MALI_COMPATIBILITY_PROFILE=ON")
                 }
 
                 // Unused by CMake itself - GenerateSCMRev.cmake queries git directly.
