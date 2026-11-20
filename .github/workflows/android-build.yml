@@ -151,7 +151,8 @@ jobs:
       - name: Build APK (standard flavor, Release)
         env:
           ASTRA_HELIO_OPTIMIZED: ${{ inputs.astra_helio_optimized || false }}
-          ASTRA_MALI_COMPATIBILITY_PROFILE: ${{ inputs.astra_mali_compatibility_profile || false }}
+          # Compile the guarded Mali path on PRs, but keep the baseline CPU ISA generic.
+          ASTRA_MALI_COMPATIBILITY_PROFILE: ${{ github.event_name == 'pull_request' && 'true' || inputs.astra_mali_compatibility_profile || false }}
         run: |
           export ANDROID_NDK_ROOT="${ANDROID_SDK_ROOT}/ndk/${NDK_VERSION}"
           export CCACHE_DIR="$HOME/.cache/ccache"
