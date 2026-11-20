@@ -145,21 +145,21 @@ jobs:
             *) echo "flag=" >> "$GITHUB_OUTPUT"; echo "name=standard" >> "$GITHUB_OUTPUT" ;;
           esac
 
-      - name: Build APK (standard flavor, Release)
+      - name: Build APK (Astra flavor, Release)
         run: |
           export ANDROID_NDK_ROOT="${ANDROID_SDK_ROOT}/ndk/${NDK_VERSION}"
           export CCACHE_DIR="$HOME/.cache/ccache"
           mkdir -p "$CCACHE_DIR"
           ccache --max-size=5G
           chmod +x .ci/android/build.sh
-          CCACHE=true .ci/android/build.sh -t standard -b Release ${{ steps.channel.outputs.flag }}
+          CCACHE=true .ci/android/build.sh -t astra -b Release ${{ steps.channel.outputs.flag }}
           ccache --show-stats
 
       - name: Upload APK/AAB artifacts
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: lemon-project-${{ steps.channel.outputs.name }}-release
+          name: astra-${{ steps.channel.outputs.name }}-release
           path: artifacts/
           retention-days: 14
           if-no-files-found: warn
