@@ -50,7 +50,7 @@ jobs:
         run: sh -n .ci/android/build.sh
       - name: Validate Astra profile wiring
         run: |
-          grep -q 'astraHelioOptimized' src/android/app/build.gradle.kts
+          grep -q 'ASTRA_HELIO_OPTIMIZED' .ci/android/build.sh
           grep -q 'astraHelioOptimized' src/android/app/build.gradle.kts
           grep -q 'arm64-v8a' src/android/app/build.gradle.kts
           grep -q 'YUZU_BUILD_PRESET' CMakeLists.txt
@@ -60,7 +60,7 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 90
     env:
-      ASTRA_HELIO_OPTIMIZED: ${{ inputs.astra_helio_optimized || false }}
+      ASTRA_HELIO_OPTIMIZED: ${{ github.event_name == 'workflow_dispatch' && inputs.astra_helio_optimized || false }}
 
     steps:
       - name: Checkout
@@ -154,19 +154,6 @@ jobs:
           chmod +x .ci/android/build.sh
           CCACHE=true .ci/android/build.sh -t standard -b Release ${{ steps.channel.outputs.flag }}
           ccache --show-stats
-
-      - name: Write build profile manifest
-        if: always()
-        run: |
-          mkdir -p artifacts
-          {
-            echo "Astra Android build profile"
-            echo "Commit: ${GITHUB_SHA}"
-            echo "CPU optimization: ${ASTRA_HELIO_OPTIMIZED}"
-            echo "ABI: arm64-v8a"
-            echo "Flavor: standard"
-            echo "Build type: Release"
-          } > artifacts/ASTRA-BUILD-PROFILE.txt
 
       - name: Upload APK/AAB artifacts
         if: always()
