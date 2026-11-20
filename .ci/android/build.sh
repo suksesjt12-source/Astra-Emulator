@@ -26,8 +26,8 @@ Options:
     -r, --release        	Enable update checker. If set, sets the DEVEL bool variable to false.
                          	By default, DEVEL is true.
     -t, --target <FLAVOR> 	Build flavor (variable: TARGET)
-                          	Valid values are: standard, spoofed, lite (its last release), legacy,
-                          	optimized, or all (standard, spoofed and lite, what a release ships)
+                          	Valid values are: standard, astra, lite, legacy, optimized, or all
+                          	(spoofed is retained as a legacy alias for astra)
                           	Default: standard
     -b, --build-type <TYPE>	Build type (variable: TYPE)
                           	Valid values are: Release, RelWithDebInfo, Debug
@@ -114,7 +114,7 @@ esac
 flavor_of() {
 	case "$1" in
 		lite) echo Lite ;;
-		spoofed) echo Spoofed ;;
+		astra|spoofed) echo Spoofed ;;
 		legacy) echo Legacy ;;
 		optimized) echo GenshinSpoof ;;
 		standard) echo Mainline ;;
@@ -190,7 +190,7 @@ fi
 
 echo "-- Done! APK and AAB artifacts are in ${ARTIFACTS_DIR}"
 
-# The file a release is published as: "Lemon-<tag>-<variant>.apk" instead of Gradle's
+# The release APK is renamed for its public flavor (Astra or Lemon) instead of Gradle's
 # "app-<flavor>-<type>.apk". The in-app updater finds a variant's APK by the END of the name
 # (src/common/net/net.cpp), so the suffix here must match the one that variant looks for, and the
 # name carries no spaces or "&" (GitHub rewrites them). Only a commit that carries a tag gets that
@@ -212,6 +212,17 @@ for t in $TARGETS; do
     RELEASE_FILE="${RELEASE_PREFIX}-${RELEASE_TAG}-${RELEASE_SUFFIX}.apk"
     cp -f "${ARTIFACTS_DIR}/app-${LOWER_FLAVOR}-${LOWER_TYPE}.apk" "${ARTIFACTS_DIR}/${RELEASE_FILE}"
     echo "-- Release file: ${RELEASE_FILE}"
+done
+
+# Give the standalone Astra APK a recognizable filename even for untagged CI builds.
+for t in $TARGETS; do
+    case "$t" in
+        astra|spoofed)
+            DEV_REV=$(git -C "${REPO_ROOT}" rev-parse --short HEAD 2>/dev/null || echo dev)
+            cp -f "${ARTIFACTS_DIR}/app-spoofed-${LOWER_TYPE}.apk" \
+                "${ARTIFACTS_DIR}/Astra-${DEV_REV}-spoofed.apk"
+            ;;
+    esac
 done
 
 mkdir -p "${ARTIFACTS_DIR}"
