@@ -43,8 +43,6 @@ Set the CCACHE variable to "true" to enable build caching.
 The APK and AAB will be output into "artifacts".
 Set ASTRA_HELIO_OPTIMIZED=true only when building for a confirmed ARMv8.2-A
 Cortex-A76/A55 target; the resulting APK is not intended for older ARM64 CPUs.
-Set ASTRA_MALI_COMPATIBILITY_PROFILE=true only to test the optional ARM Mali
-Vulkan compatibility workarounds. It defaults to false.
 
 EOF
 
@@ -87,15 +85,10 @@ done
 : "${TYPE:=Release}"
 : "${DEVEL:=true}"
 : "${ASTRA_HELIO_OPTIMIZED:=false}"
-: "${ASTRA_MALI_COMPATIBILITY_PROFILE:=false}"
 
 case "${ASTRA_HELIO_OPTIMIZED}" in
     true|false) ;;
     *) die "ASTRA_HELIO_OPTIMIZED must be true or false." ;;
-esac
-case "${ASTRA_MALI_COMPATIBILITY_PROFILE}" in
-    true|false) ;;
-    *) die "ASTRA_MALI_COMPATIBILITY_PROFILE must be true or false." ;;
 esac
 
 # GetSCMRev.cmake only uses the clean git tag (e.g. "v0.2.3") as the build version when a
@@ -188,7 +181,6 @@ echo "-- building..."
     -Pexperimental="$EXPERIMENTAL" \
     -PfastDev="${FAST:-false}" \
     -PastraHelioOptimized="${ASTRA_HELIO_OPTIMIZED}" \
-    -PastraMaliCompatibilityProfile="${ASTRA_MALI_COMPATIBILITY_PROFILE}" \
     --info
 
 if [ -n "${ANDROID_KEYSTORE_B64}" ]; then
