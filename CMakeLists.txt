@@ -77,7 +77,7 @@ option(LEMON_LITE "Lemon Lite: lighter default settings for weaker GPUs (android
 option(LEMON_SPOOFED "Lemon Lite & Spoofed: installed under another app's package name (android only)" OFF)
 
 # Astra: conservative feature gating for ARM's proprietary Mali Vulkan driver.
-# Enabled by default only for Android ARM64; runtime detection keeps other GPU drivers untouched.
+# Opt-in for Android ARM64; runtime detection limits it to ARM's proprietary Mali Vulkan driver.
 cmake_dependent_option(ASTRA_MALI_COMPATIBILITY_PROFILE
     "Enable Astra's ARM Mali Vulkan compatibility profile (Android ARM64 only)"
     OFF "ANDROID AND ARCHITECTURE_arm64" OFF)
