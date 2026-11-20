@@ -76,16 +76,6 @@ option(YUZU_LEGACY "Apply patches that improve compatibility with older GPUs (e.
 option(LEMON_LITE "Lemon Lite: lighter default settings for weaker GPUs (android only)" OFF)
 option(LEMON_SPOOFED "Lemon Lite & Spoofed: installed under another app's package name (android only)" OFF)
 
-# Astra: conservative feature gating for ARM's proprietary Mali Vulkan driver.
-# Opt-in for Android ARM64; runtime detection limits it to ARM's proprietary Mali Vulkan driver.
-cmake_dependent_option(ASTRA_MALI_COMPATIBILITY_PROFILE
-    "Enable Astra's ARM Mali Vulkan compatibility profile (Android ARM64 only)"
-    OFF "ANDROID AND ARCHITECTURE_arm64" OFF)
-
-if (ASTRA_MALI_COMPATIBILITY_PROFILE)
-    add_compile_definitions(ASTRA_MALI_COMPATIBILITY_PROFILE=1)
-endif()
-
 option(NIGHTLY_BUILD "Use Nightly qualifiers in the update checker and build metadata" OFF)
 
 option(YUZU_DOWNLOAD_TIME_ZONE_DATA "Always download time zone binaries" ON)
