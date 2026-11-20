@@ -457,6 +457,12 @@ Device::Device(VkInstance instance_, vk::PhysicalDevice physical_, VkSurfaceKHR 
 
     const VkDriverId driver_id = properties.driver.driverID;
 
+    LOG_INFO(Render_Vulkan,
+             "GPU: {} | Driver: {} | Driver info: {} | Vendor ID: 0x{:04X} | Driver ID: {}",
+             properties.properties.deviceName, properties.driver.driverName,
+             properties.driver.driverInfo, properties.properties.vendorID,
+             static_cast<u32>(driver_id));
+
     const bool is_radv = driver_id == VK_DRIVER_ID_MESA_RADV;
     const bool is_amd_driver =
         driver_id == VK_DRIVER_ID_AMD_PROPRIETARY || driver_id == VK_DRIVER_ID_AMD_OPEN_SOURCE;
