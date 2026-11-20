@@ -6,7 +6,8 @@
 
 NUM_JOBS=$(nproc 2>/dev/null || getconf _NPROCESSORS_ONLN 2>/dev/null || echo 2)
 export CMAKE_BUILD_PARALLEL_LEVEL="${NUM_JOBS}"
-ARTIFACTS_DIR="$PWD/artifacts"
+REPO_ROOT="$PWD"
+ARTIFACTS_DIR="$REPO_ROOT/artifacts"
 
 : "${CCACHE:=false}"
 RETURN=0
@@ -219,5 +220,15 @@ for t in $TARGETS; do
         echo "-- Release file: ${LEGACY_FILE} (copy for Lite & Spoofed installs)"
     fi
 done
+
+mkdir -p "${ARTIFACTS_DIR}"
+{
+    echo "Astra Android build profile"
+    echo "Commit: $(git -C "${REPO_ROOT}" rev-parse HEAD 2>/dev/null || echo unknown)"
+    echo "CPU optimization: ${ASTRA_HELIO_OPTIMIZED}"
+    echo "ABI: arm64-v8a"
+    echo "Flavor: ${TARGET}"
+    echo "Build type: ${TYPE}"
+} > "${ARTIFACTS_DIR}/ASTRA-BUILD-PROFILE.txt"
 
 ls -l "${ARTIFACTS_DIR}/"
