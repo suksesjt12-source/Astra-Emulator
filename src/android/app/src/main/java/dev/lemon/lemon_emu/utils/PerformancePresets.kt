@@ -53,21 +53,27 @@ object PerformancePresets {
             int(IntSetting.RENDERER_SCALING_FILTER, 1),
             int(IntSetting.RENDERER_ANTI_ALIASING, 0),
             int(IntSetting.RENDERER_ACCURACY, 0),
-            bool(BooleanSetting.RENDERER_ASYNCHRONOUS_SHADERS, true)
+            bool(BooleanSetting.RENDERER_ASYNCHRONOUS_SHADERS, true),
+            bool(BooleanSetting.RENDERER_ASYNCHRONOUS_GPU_EMULATION, null),
+            bool(BooleanSetting.RENDERER_USE_DISK_SHADER_CACHE, null)
         )
         Preset.NORMAL -> listOf(
             int(IntSetting.RENDERER_RESOLUTION, null),
             int(IntSetting.RENDERER_SCALING_FILTER, null),
             int(IntSetting.RENDERER_ANTI_ALIASING, null),
             int(IntSetting.RENDERER_ACCURACY, null),
-            bool(BooleanSetting.RENDERER_ASYNCHRONOUS_SHADERS, null)
+            bool(BooleanSetting.RENDERER_ASYNCHRONOUS_SHADERS, null),
+            bool(BooleanSetting.RENDERER_ASYNCHRONOUS_GPU_EMULATION, null),
+            bool(BooleanSetting.RENDERER_USE_DISK_SHADER_CACHE, null)
         )
         Preset.QUALITY -> listOf(
             int(IntSetting.RENDERER_RESOLUTION, 6),
             int(IntSetting.RENDERER_SCALING_FILTER, 2),
             int(IntSetting.RENDERER_ANTI_ALIASING, 1),
             int(IntSetting.RENDERER_ACCURACY, 1),
-            bool(BooleanSetting.RENDERER_ASYNCHRONOUS_SHADERS, false)
+            bool(BooleanSetting.RENDERER_ASYNCHRONOUS_SHADERS, false),
+            bool(BooleanSetting.RENDERER_ASYNCHRONOUS_GPU_EMULATION, null),
+            bool(BooleanSetting.RENDERER_USE_DISK_SHADER_CACHE, null)
         )
         Preset.HELIO -> listOf(
             // Res3_4X = 2, NearestNeighbor = 0, AntiAliasing::None = 0,
