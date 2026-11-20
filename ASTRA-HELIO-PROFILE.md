@@ -16,6 +16,30 @@ MediaTek lists the Helio G100 as two Arm Cortex-A76 cores and six Cortex-A55 cor
 
 The Android app's native ABI filter remains `arm64-v8a`. The profile does not change CPU frequencies, voltage, thermal policy, or kernel settings.
 
+## Astra Android identity
+
+The standalone Astra variant installs with application ID `dev.astra.emulator` and launcher name `Astra Emulator`. It does not use AnTuTu's `com.antutu.ABenchMark` application ID. The internal Gradle flavor name remains `spoofed` for compatibility with the upstream native updater asset suffix; the build script exposes it publicly as `astra`.
+
+Build the standalone flavor with:
+
+```sh
+.ci/android/build.sh -t astra -b Release
+```
+
+The resulting development APK is also copied to a filename beginning with `Astra-` and ending in `spoofed.apk`, which keeps the existing in-app updater asset lookup working.
+
+## Helio in-app performance preset
+
+The Android Quick Settings performance tile now cycles through Speed, Normal, Quality and Helio. The Helio preset applies:
+
+- 0.75x render resolution.
+- Nearest-neighbor scaling.
+- No anti-aliasing and low GPU accuracy.
+- Asynchronous shader work and asynchronous GPU emulation.
+- Disk shader cache enabled.
+
+This is a GPU-load-oriented configuration, not an overclock. Image quality is reduced compared with Normal/Quality modes. It can help when rendering load is the bottleneck; it cannot speed up CPU-bound workloads or guarantee a fixed FPS. The existing Adaptive Performance feature may still switch to Speed when thermal or performance triggers fire.
+
 ## Build validation and metadata
 
 The Android GitHub Actions workflow:
