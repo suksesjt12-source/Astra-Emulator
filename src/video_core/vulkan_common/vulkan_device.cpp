@@ -698,7 +698,10 @@ Device::Device(VkInstance instance_, vk::PhysicalDevice physical_, VkSurfaceKHR 
 #if defined(ASTRA_MALI_COMPATIBILITY_PROFILE) && defined(__ANDROID__) && defined(ARCHITECTURE_arm64)
     // Use the Vulkan driver identity rather than the SoC marketing name: this workaround
     // is specific to ARM's proprietary Mali driver. Other Android GPU drivers are untouched.
-    if (driver_id == VK_DRIVER_ID_ARM_PROPRIETARY) {
+    constexpr u32 ARM_VULKAN_VENDOR_ID = 0x13B5;
+    const bool is_arm_gpu = properties.properties.vendorID == ARM_VULKAN_VENDOR_ID;
+
+    if (is_arm_gpu && driver_id == VK_DRIVER_ID_ARM_PROPRIETARY) {
         LOG_WARNING(Render_Vulkan,
                     "Astra Mali profile: disabling EDS2/EDS3, provoking vertex, and robustness2 "
                     "to use conservative driver paths");
