@@ -4,7 +4,7 @@ This profile is intended for Android ARM64 devices with big.LITTLE CPU clusters 
 
 ## 1. Mali Vulkan compatibility profile
 
-On Android ARM64 builds, `ASTRA_MALI_COMPATIBILITY_PROFILE` defaults to ON. At runtime it applies only when Vulkan reports `VK_DRIVER_ID_ARM_PROPRIETARY`.
+On Android ARM64 builds, `ASTRA_MALI_COMPATIBILITY_PROFILE` defaults to OFF. Enable it only when investigating a Mali Vulkan compatibility issue. At runtime it applies only when both the Vulkan vendor ID is ARM (`0x13B5`) and the driver ID is `VK_DRIVER_ID_ARM_PROPRIETARY`.
 
 The profile disables these optional Vulkan feature paths for that driver:
 
@@ -13,12 +13,12 @@ The profile disables these optional Vulkan feature paths for that driver:
 - `VK_EXT_provoking_vertex`
 - `VK_KHR_robustness2` or `VK_EXT_robustness2`
 
-The emulator then uses its existing fallback paths. This is a conservative compatibility change; it is **not** a measured FPS improvement, and it does not affect Adreno, Turnip, Intel, or NVIDIA drivers. A startup log entry beginning with `Astra Mali profile:` confirms that the runtime path was selected.
+The emulator then uses its existing fallback paths. This is a conservative compatibility change; it is **not** a measured FPS improvement, and it does not affect Adreno, Turnip, Intel, or NVIDIA drivers. The Vulkan startup log includes GPU name, driver name/info, vendor ID and driver ID. A log entry beginning with `Astra Mali profile:` confirms that the optional fallback path was selected.
 
-To disable the profile in a custom CMake build, pass:
+To enable the profile in a custom CMake build, pass:
 
 ```text
--DASTRA_MALI_COMPATIBILITY_PROFILE=OFF
+-DASTRA_MALI_COMPATIBILITY_PROFILE=ON
 ```
 
 ## 2. Optional Helio CPU code-generation preset
@@ -27,6 +27,9 @@ The Android Gradle build accepts `-PastraHelioOptimized=true`. The build script 
 
 ```sh
 ASTRA_HELIO_OPTIMIZED=true .ci/android/build.sh -t standard -b Release
+
+# Only when testing the Mali driver compatibility fallback:
+ASTRA_MALI_COMPATIBILITY_PROFILE=true .ci/android/build.sh -t standard -b Release
 ```
 
 This selects the existing ARM64 `YUZU_BUILD_PRESET=optimized` preset, which compiles with `-march=armv8.2-a+lse+rcpc`. It is opt-in and must only be used for devices whose complete CPU cluster supports that instruction baseline. It is not a universal Android ARM64 APK. The default build remains generic.
@@ -41,4 +44,4 @@ The preset is intended for SoCs whose CPU topology and ISA have been verified, s
 4. Record peak RAM and device temperature over a repeatable 20–30 minute session.
 5. Test a non-Mali Android GPU to confirm the driver-specific path is not activated.
 
-No APK build or physical-device performance result is claimed by this source change. The Android CI workflow now also runs for pull requests so the native build can be checked before merging.
+No APK build or physical-device performance result is claimed by this source change. The Android CI workflow runs a preflight script/profile check for pull requests. Manual workflow dispatch can separately enable the Helio CPU preset or Mali compatibility profile.
