@@ -1,47 +1,32 @@
-# Astra Helio and ARM Mali profile
+# Astra Helio CPU build profile
 
-This profile is intended for Android ARM64 devices with big.LITTLE CPU clusters and ARM Mali Vulkan drivers. It separates two independent changes.
+Astra provides an opt-in CPU code-generation preset for Android ARM64 devices whose complete CPU cluster supports the selected instruction baseline.
 
-## 1. Mali Vulkan compatibility profile
+## Helio optimized build
 
-On Android ARM64 builds, `ASTRA_MALI_COMPATIBILITY_PROFILE` defaults to OFF. Enable it only when investigating a Mali Vulkan compatibility issue. At runtime it applies only when both the Vulkan vendor ID is ARM (`0x13B5`) and the driver ID is `VK_DRIVER_ID_ARM_PROPRIETARY`.
-
-The profile disables these optional Vulkan feature paths for that driver:
-
-- `VK_EXT_extended_dynamic_state2`
-- `VK_EXT_extended_dynamic_state3`
-- `VK_EXT_provoking_vertex`
-- `VK_KHR_robustness2` or `VK_EXT_robustness2`
-
-The emulator then uses its existing fallback paths. This is a conservative compatibility change; it is **not** a measured FPS improvement, and it does not affect Adreno, Turnip, Intel, or NVIDIA drivers. The Vulkan startup log includes GPU name, driver name/info, vendor ID and driver ID. A log entry beginning with `Astra Mali profile:` confirms that the optional fallback path was selected.
-
-To enable the profile in a custom CMake build, pass:
-
-```text
--DASTRA_MALI_COMPATIBILITY_PROFILE=ON
-```
-
-## 2. Optional Helio CPU code-generation preset
-
-The Android Gradle build accepts `-PastraHelioOptimized=true`. The build script exposes it as an environment variable:
+Run the standard Android release build with:
 
 ```sh
 ASTRA_HELIO_OPTIMIZED=true .ci/android/build.sh -t standard -b Release
-
-# Only when testing the Mali driver compatibility fallback:
-ASTRA_MALI_COMPATIBILITY_PROFILE=true .ci/android/build.sh -t standard -b Release
 ```
 
-This selects the existing ARM64 `YUZU_BUILD_PRESET=optimized` preset, which compiles with `-march=armv8.2-a+lse+rcpc`. It is opt-in and must only be used for devices whose complete CPU cluster supports that instruction baseline. It is not a universal Android ARM64 APK. The default build remains generic.
+This selects the existing ARM64 `YUZU_BUILD_PRESET=optimized` setting, which adds `-march=armv8.2-a+lse+rcpc`. It is optional; the default build remains on the generic ARM64 target.
 
-The preset is intended for SoCs whose CPU topology and ISA have been verified, such as Cortex-A76/A55-based variants. MediaTek lists the Helio G100 as two Cortex-A76 cores plus six Cortex-A55 cores and an Arm Mali-G57-class GPU. See the [MediaTek Helio G100 specification](https://www.mediatek.com/products/smartphones/mediatek-helio-g100) and Arm's [Cortex-A76](https://support.arm.com/compute-ip/cortex-a76) and [Cortex-A55](https://support.arm.com/compute-ip/cortex-a55) documentation. Do not distribute an optimized build to unrelated ARM64 devices without checking their ISA support.
+MediaTek lists the Helio G100 as two Arm Cortex-A76 cores and six Cortex-A55 cores, with a Mali-G57-class GPU. Verify the exact SoC and CPU implementation before distributing an optimized APK to other device families. The optimized build is not a universal ARM64 APK. See the [MediaTek Helio G100 specification](https://www.mediatek.com/products/smartphones/mediatek-helio-g100), the [Cortex-A76 information](https://support.arm.com/compute-ip/cortex-a76), and the [Cortex-A55 information](https://support.arm.com/compute-ip/cortex-a55).
 
-## Validation checklist
+The Android app's native ABI filter remains `arm64-v8a`. The profile does not change CPU frequencies, voltage, thermal policy, or kernel settings.
 
-1. Confirm the device Vulkan driver reports ARM proprietary and the log contains the Astra Mali profile message.
-2. Confirm games still reach the renderer and fallback descriptor handling is correct.
-3. Compare frame-time percentiles, not only average FPS, with the generic build using the same game, scene, resolution, and driver.
-4. Record peak RAM and device temperature over a repeatable 20–30 minute session.
-5. Test a non-Mali Android GPU to confirm the driver-specific path is not activated.
+## Build validation and metadata
 
-No APK build or physical-device performance result is claimed by this source change. Pull requests run a shell/profile preflight followed by the standard Android build. Manual workflow dispatch exposes independent switches for the Helio CPU preset and the optional Mali compatibility profile.
+The Android GitHub Actions workflow:
+
+- Runs a preflight check for shell syntax and the Android ARM64/Gradle/CMake option wiring.
+- Supports a manual `astra_helio_optimized` input to build the optimized variant.
+- Runs the regular Android NDK build after preflight.
+- Uploads `ASTRA-BUILD-PROFILE.txt` beside the APK/AAB artifact, recording the commit, ABI, flavor, build type, and CPU optimization choice.
+
+## Device validation
+
+For a meaningful comparison, use the same game, driver, resolution, scene, and power conditions for the generic and optimized builds. Record frame-time percentiles, peak RAM, device temperature, and whether the game completes a repeatable 20–30 minute session.
+
+A successful CI build confirms compilation only. It does not prove a game is playable or that FPS, stability, or temperature improves on a physical device.
