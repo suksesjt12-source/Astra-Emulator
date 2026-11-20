@@ -107,7 +107,7 @@ fi
 TARGET_LOWER=$(echo "$TARGET" | tr '[:upper:]' '[:lower:]')
 
 case "$TARGET_LOWER" in
-	all) TARGETS="standard spoofed lite" ;;
+	all) TARGETS="standard astra lite" ;;
 	*) TARGETS="$TARGET_LOWER" ;;
 esac
 
@@ -200,7 +200,7 @@ for t in $TARGETS; do
     case "$t" in
         standard) RELEASE_PREFIX=Lemon; RELEASE_SUFFIX=standard ;;
         lite) RELEASE_PREFIX=Lemon-Lite; RELEASE_SUFFIX=lite ;;
-        spoofed) RELEASE_PREFIX=Lemon-Spoofed; RELEASE_SUFFIX=spoofed ;;
+        astra|spoofed) RELEASE_PREFIX=Astra; RELEASE_SUFFIX=spoofed ;;
         *) continue ;;
     esac
     [ "$DEVEL" != "true" ] || continue
@@ -212,13 +212,6 @@ for t in $TARGETS; do
     RELEASE_FILE="${RELEASE_PREFIX}-${RELEASE_TAG}-${RELEASE_SUFFIX}.apk"
     cp -f "${ARTIFACTS_DIR}/app-${LOWER_FLAVOR}-${LOWER_TYPE}.apk" "${ARTIFACTS_DIR}/${RELEASE_FILE}"
     echo "-- Release file: ${RELEASE_FILE}"
-    if [ "$t" = spoofed ]; then
-        # Lemon Lite & Spoofed installs (same package) still look for "lite-spoofed.apk": the same
-        # APK under that name too, so they update into Lemon Spoofed.
-        LEGACY_FILE="Lemon-Lite-Spoofed-${RELEASE_TAG}-lite-spoofed.apk"
-        cp -f "${ARTIFACTS_DIR}/app-${LOWER_FLAVOR}-${LOWER_TYPE}.apk" "${ARTIFACTS_DIR}/${LEGACY_FILE}"
-        echo "-- Release file: ${LEGACY_FILE} (copy for Lite & Spoofed installs)"
-    fi
 done
 
 mkdir -p "${ARTIFACTS_DIR}"
