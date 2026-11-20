@@ -44,4 +44,4 @@ The preset is intended for SoCs whose CPU topology and ISA have been verified, s
 4. Record peak RAM and device temperature over a repeatable 20–30 minute session.
 5. Test a non-Mali Android GPU to confirm the driver-specific path is not activated.
 
-No APK build or physical-device performance result is claimed by this source change. The Android CI workflow runs a preflight script/profile check for pull requests. Manual workflow dispatch can separately enable the Helio CPU preset or Mali compatibility profile.
+No APK build or physical-device performance result is claimed by this source change. Pull requests run a shell/profile preflight followed by the standard Android build. Manual workflow dispatch exposes independent switches for the Helio CPU preset and the optional Mali compatibility profile.
