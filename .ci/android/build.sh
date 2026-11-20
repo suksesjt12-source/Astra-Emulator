@@ -89,6 +89,15 @@ done
 : "${ASTRA_HELIO_OPTIMIZED:=false}"
 : "${ASTRA_MALI_COMPATIBILITY_PROFILE:=false}"
 
+case "${ASTRA_HELIO_OPTIMIZED}" in
+    true|false) ;;
+    *) die "ASTRA_HELIO_OPTIMIZED must be true or false." ;;
+esac
+case "${ASTRA_MALI_COMPATIBILITY_PROFILE}" in
+    true|false) ;;
+    *) die "ASTRA_MALI_COMPATIBILITY_PROFILE must be true or false." ;;
+esac
+
 # GetSCMRev.cmake only uses the clean git tag (e.g. "v0.2.3") as the build version when a
 # GIT-RELEASE marker file exists at the repo root when CMake configures - otherwise it falls
 # back to a "<commit-hash>-<branch>" string, which would never match a GitHub release tag and
