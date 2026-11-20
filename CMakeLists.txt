@@ -74,7 +74,7 @@ option(YUZU_DOWNLOAD_ANDROID_VVL "Download validation layer binary for android" 
 option(YUZU_LEGACY "Apply patches that improve compatibility with older GPUs (e.g. Snapdragon 865) at the cost of performance" OFF)
 
 option(LEMON_LITE "Lemon Lite: lighter default settings for weaker GPUs (android only)" OFF)
-option(LEMON_SPOOFED "Lemon Lite & Spoofed: installed under another app's package name (android only)" OFF)
+option(LEMON_SPOOFED "Build the Astra standalone Android flavor (legacy internal flag)" OFF)
 
 option(NIGHTLY_BUILD "Use Nightly qualifiers in the update checker and build metadata" OFF)
 
