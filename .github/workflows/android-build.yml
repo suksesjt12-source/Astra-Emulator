@@ -15,11 +15,6 @@ on:
         required: false
         default: false
         type: boolean
-      astra_mali_compatibility_profile:
-        description: "Enable optional ARM Mali Vulkan compatibility workarounds"
-        required: false
-        default: false
-        type: boolean
   pull_request:
     branches: [main]
     paths:
@@ -56,14 +51,16 @@ jobs:
       - name: Validate Astra profile wiring
         run: |
           grep -q 'astraHelioOptimized' src/android/app/build.gradle.kts
-          grep -q 'astraMaliCompatibilityProfile' src/android/app/build.gradle.kts
-          grep -q 'ASTRA_MALI_COMPATIBILITY_PROFILE' CMakeLists.txt
-          grep -q 'VK_DRIVER_ID_ARM_PROPRIETARY' src/video_core/vulkan_common/vulkan_device.cpp
+          grep -q 'astraHelioOptimized' src/android/app/build.gradle.kts
+          grep -q 'arm64-v8a' src/android/app/build.gradle.kts
+          grep -q 'YUZU_BUILD_PRESET' CMakeLists.txt
 
   build:
     needs: preflight
     runs-on: ubuntu-latest
     timeout-minutes: 90
+    env:
+      ASTRA_HELIO_OPTIMIZED: ${{ inputs.astra_helio_optimized || false }}
 
     steps:
       - name: Checkout
@@ -149,10 +146,6 @@ jobs:
           esac
 
       - name: Build APK (standard flavor, Release)
-        env:
-          ASTRA_HELIO_OPTIMIZED: ${{ inputs.astra_helio_optimized || false }}
-          # Compile the guarded Mali path on PRs, but keep the baseline CPU ISA generic.
-          ASTRA_MALI_COMPATIBILITY_PROFILE: ${{ github.event_name == 'pull_request' && 'true' || inputs.astra_mali_compatibility_profile || false }}
         run: |
           export ANDROID_NDK_ROOT="${ANDROID_SDK_ROOT}/ndk/${NDK_VERSION}"
           export CCACHE_DIR="$HOME/.cache/ccache"
@@ -161,6 +154,19 @@ jobs:
           chmod +x .ci/android/build.sh
           CCACHE=true .ci/android/build.sh -t standard -b Release ${{ steps.channel.outputs.flag }}
           ccache --show-stats
+
+      - name: Write build profile manifest
+        if: always()
+        run: |
+          mkdir -p artifacts
+          {
+            echo "Astra Android build profile"
+            echo "Commit: ${GITHUB_SHA}"
+            echo "CPU optimization: ${ASTRA_HELIO_OPTIMIZED}"
+            echo "ABI: arm64-v8a"
+            echo "Flavor: standard"
+            echo "Build type: Release"
+          } > artifacts/ASTRA-BUILD-PROFILE.txt
 
       - name: Upload APK/AAB artifacts
         if: always()
