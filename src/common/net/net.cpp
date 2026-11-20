@@ -83,8 +83,8 @@ std::vector<Asset> Release::GetPlatformAssets() const {
     find_asset("Standard", {"chromeos.apk"});
 #elif defined(ARCHITECTURE_arm64)
 #ifdef LEMON_SPOOFED
-    // Lemon Spoofed. Releases also carry a copy named "...-lite-spoofed.apk" for Lite & Spoofed
-    // installs, which still look for that name; both end in "spoofed.apk".
+    // Astra standalone flavor. Keep this asset suffix for the existing updater lookup,
+    // but the installed application ID is dev.astra.emulator (not AnTuTu's package).
     find_asset("Standard", {"spoofed.apk"});
 #elif defined(LEMON_LITE)
     // The last Lemon Lite: Lite's light settings are Lemon's Speed mode now, so its updates are
