@@ -13,7 +13,7 @@
     <string name="app_notification_channel_name" translatable="false">Astra Emulator</string>
     <string name="app_notification_channel_id" translatable="false">AstraEmulator</string>
     <string name="app_notification_channel_description">Astra Emulator notifications</string>
-    <string name="app_notification_running">Lemon is Running</string>
+    <string name="app_notification_running">Astra is Running</string>
     <string name="seconds">Seconds</string>
 
     <!-- Spinbox strings -->
@@ -963,15 +963,15 @@
     <string name="recommended_driver">Recommended Driver:</string>
     <string name="install_recommended_driver">Install recommended driver</string>
     <string name="no_recommended_driver_available">No recommended driver found for this GPU yet</string>
-    <string name="performance_preset">Mode</string>
-    <string name="performance_preset_description">Speed, Normal or Quality: the whole emulator set up in one tap</string>
+    <string name="performance_preset">Astra Performance</string>
+    <string name="performance_preset_description">Speed, Normal, Quality or Helio: configure the emulator in one tap</string>
     <string name="adaptive_performance">Adaptive performance</string>
     <string name="adaptive_performance_description">Automatically lowers graphics settings if the device overheats or can\'t keep up, and notifies you when it does</string>
     <string name="thermal_throttle_applied">Device is running hot - switched to Speed mode</string>
     <string name="perf_throttle_applied">Performance is low - switched to Speed mode</string>
-    <string name="adaptive_performance_notif_title">Lemon reduced graphics settings</string>
-    <string name="adaptive_performance_notif_thermal_text">Your device got too hot, so Lemon switched to Speed mode. Tap to open Settings if you\'d like to turn this off.</string>
-    <string name="adaptive_performance_notif_perf_text">This game was running well below full speed, so Lemon switched to Speed mode. Tap to open Settings if you\'d like to turn this off.</string>
+    <string name="adaptive_performance_notif_title">Astra reduced graphics settings</string>
+    <string name="adaptive_performance_notif_thermal_text">Your device got too hot, so Astra switched to Speed mode. Tap to open Settings if you\'d like to turn this off.</string>
+    <string name="adaptive_performance_notif_perf_text">This game was running well below full speed, so Astra switched to Speed mode. Tap to open Settings if you\'d like to turn this off.</string>
     <string name="enabled">Enabled</string>
     <string name="preset_speed">Speed</string>
     <string name="preset_speed_description">Lighter settings for less powerful devices</string>
@@ -979,6 +979,8 @@
     <string name="preset_normal_description">The default settings</string>
     <string name="preset_quality">Quality</string>
     <string name="preset_quality_description">A sharper image for powerful devices</string>
+    <string name="preset_helio">Helio</string>
+    <string name="preset_helio_description">Lower GPU load for midrange Mali devices: 0.75x resolution, no anti-aliasing, low GPU accuracy and asynchronous shader work. Image quality is reduced; device temperatures and FPS still depend on the game and system cooling.</string>
     <string name="preset_custom">Custom</string>
     <string name="preset_applied">%1$s mode applied</string>
     <string name="preset_applied_per_game">%1$s mode applied for this game</string>
