@@ -9,6 +9,17 @@ name: Android build
 
 on:
   workflow_dispatch:
+    inputs:
+      astra_helio_optimized:
+        description: "Use the ARMv8.2-A optimized build for a verified Cortex-A76/A55 target"
+        required: false
+        default: false
+        type: boolean
+      astra_mali_compatibility_profile:
+        description: "Enable optional ARM Mali Vulkan compatibility workarounds"
+        required: false
+        default: false
+        type: boolean
   pull_request:
     branches: [main]
     paths:
@@ -35,7 +46,22 @@ env:
   CMAKE_VERSION: "3.31.6"
 
 jobs:
+  preflight:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Validate Android build script syntax
+        run: sh -n .ci/android/build.sh
+      - name: Validate Astra profile wiring
+        run: |
+          grep -q 'astraHelioOptimized' src/android/app/build.gradle.kts
+          grep -q 'astraMaliCompatibilityProfile' src/android/app/build.gradle.kts
+          grep -q 'ASTRA_MALI_COMPATIBILITY_PROFILE' CMakeLists.txt
+          grep -q 'VK_DRIVER_ID_ARM_PROPRIETARY' src/video_core/vulkan_common/vulkan_device.cpp
+
   build:
+    needs: preflight
     runs-on: ubuntu-latest
     timeout-minutes: 90
 
@@ -123,6 +149,9 @@ jobs:
           esac
 
       - name: Build APK (standard flavor, Release)
+        env:
+          ASTRA_HELIO_OPTIMIZED: ${{ inputs.astra_helio_optimized || false }}
+          ASTRA_MALI_COMPATIBILITY_PROFILE: ${{ inputs.astra_mali_compatibility_profile || false }}
         run: |
           export ANDROID_NDK_ROOT="${ANDROID_SDK_ROOT}/ndk/${NDK_VERSION}"
           export CCACHE_DIR="$HOME/.cache/ccache"
